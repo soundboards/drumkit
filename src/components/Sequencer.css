@@ -1,3 +1,18 @@
-.test {
-  background: red;
+body {
+  background-color: #000;
+}
+
+.sequence-button {
+  background-color: #1f2428;
+  border: none;
+  height: 3rem;
+  width: 3rem;
+}
+
+.sequence-button.sequence-button--seq {
+  background-color: #e2c000;
+}
+
+.sequence-button.sequence-button--selected {
+  background-color: #e2c000;
 }

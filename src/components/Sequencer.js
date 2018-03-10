@@ -57,14 +57,17 @@ class Sequencer extends React.Component {
   }
   
   renderInstrument(key) {
-    const instrumentButtons = this.state.sequence[key].map((buttonState, index) => {
+    const { sequence } = this.state;
+    const instrumentButtons = sequence[key].map((buttonState, index) => {
       return (
         <button
-          className={classNames({ test: this.state.currentStep === index })}
+          className={classNames('sequence-button',
+            { ['sequence-button--seq']: this.state.currentStep === index },
+            { ['sequence-button--selected']: sequence[key][index] === 1}
+          )}
           key={index}
           onClick={this.onButtonClick.bind(this, index, key)}
         >
-          {buttonState}
         </button>
       );
     });

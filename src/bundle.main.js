@@ -18348,16 +18348,13 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
   }
 
   renderInstrument(key) {
-    const instrumentButtons = this.state.sequence[key].map((buttonState, index) => {
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'button',
-        {
-          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()({ test: this.state.currentStep === index }),
-          key: index,
-          onClick: this.onButtonClick.bind(this, index, key)
-        },
-        buttonState
-      );
+    const { sequence } = this.state;
+    const instrumentButtons = sequence[key].map((buttonState, index) => {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('button', {
+        className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('sequence-button', { ['sequence-button--seq']: this.state.currentStep === index }, { ['sequence-button--selected']: sequence[key][index] === 1 }),
+        key: index,
+        onClick: this.onButtonClick.bind(this, index, key)
+      });
     });
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -18512,7 +18509,7 @@ exports = module.exports = __webpack_require__(32)(false);
 
 
 // module
-exports.push([module.i, ".test {\n  background: red;\n}", ""]);
+exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: none;\n  height: 3rem;\n  width: 3rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}", ""]);
 
 // exports
 

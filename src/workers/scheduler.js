@@ -6,7 +6,6 @@ self.onmessage = function (e) {
       // if timer already exists
 			clearInterval(timerID);
 		}
-
     timerID = setInterval(() => { postMessage('step'); }, e.data.interval);
   } else if (e.data == 'stop') {
 		clearInterval(timerID);

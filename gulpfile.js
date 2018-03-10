@@ -39,6 +39,7 @@ gulp.task('browser-sync', () => {
 
 gulp.task('watch', () => {
     gulp.watch(sourcePath + 'components/*.js', ['js']);
+    gulp.watch(sourcePath + 'components/*.css', ['js']);
 });
 
 gulp.task('default', ['js', 'watch', 'browser-sync']);
