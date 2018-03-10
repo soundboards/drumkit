@@ -2,17 +2,29 @@ body {
   background-color: #000;
 }
 
+.control-buttons {
+  background-color: #1f2428;
+  border: 1px solid #000;
+  padding: 1rem;
+  font-size: 1.5rem;
+}
+
 .sequence-button {
   background-color: #1f2428;
-  border: none;
-  height: 3rem;
-  width: 3rem;
+  border: 1px solid #000;
+  height: 4rem;
+  width: 4rem;
 }
 
 .sequence-button.sequence-button--seq {
-  background-color: #e2c000;
+  background-color: #3a434b;
 }
 
 .sequence-button.sequence-button--selected {
   background-color: #e2c000;
 }
+
+.sequence-button.sequence-button--seq.sequence-button--selected {
+  background-color: #00E34F;
+}
+

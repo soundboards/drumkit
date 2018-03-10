@@ -18,20 +18,19 @@ class Sequencer extends React.Component {
       sequence: {
         kick: [0,0,0,0,0,0,0,0],
         snare: [0,0,0,0,0,0,0,0],
-        bass: [0,0,0,0,0,0,0,0],
+        openHat: [0,0,0,0,0,0,0,0],
+        closedHat: [0,0,0,0,0,0,0,0],
       }
     };
     
     this.timerWorker = new Worker('../workers/scheduler');
     this.playSequence = this.playSequence.bind(this);
+    this.pauseSequence = this.pauseSequence.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
   
   playSequence() {
-    if (this.state.playing) {
-      this.timerWorker.postMessage('stop');
-      this.setState({playing: false});
-    } else {
+    if (!this.state.playing) {
       const interval = calculateInterval(this.state.bpm);
       this.timerWorker.postMessage({ interval });
       
@@ -48,6 +47,14 @@ class Sequencer extends React.Component {
       this.setState({playing: true});
     }
   }
+  
+  pauseSequence() {
+    if (this.state.playing) {
+      this.timerWorker.postMessage('stop');
+      this.setState({playing: false});
+    }
+  }
+  
   
   onButtonClick(position, key) {
     const { sequence } = this.state;
@@ -74,7 +81,7 @@ class Sequencer extends React.Component {
     
     return <div>{instrumentButtons}</div>
   }
-  
+
   render() {
     const { sequence } = this.state;
     const setBpm = (elem) => {
@@ -88,8 +95,18 @@ class Sequencer extends React.Component {
 
     return (
       <div>
-        <button onClick={this.playSequence}>Play/Pause</button>
-        <input onBlur={setBpm} />
+        <button
+          className="control-buttons"
+          onClick={this.playSequence}
+        >
+          Play
+        </button>
+        <button
+          className="control-buttons"
+          onClick={this.pauseSequence}
+          >Pause
+        </button>
+        <input className="control-buttons" onBlur={setBpm} />
         <div>
           {Object.keys(sequence).map((key) => this.renderInstrument(key))}
         </div>
