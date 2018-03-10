@@ -1,7 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import loops from '../data/loops';
+
 import styles from './Sequencer.css';
+
 
 // Helper function
 const calculateInterval = (bpm) => 60000 / bpm;
@@ -81,6 +84,25 @@ class Sequencer extends React.Component {
     
     return <div>{instrumentButtons}</div>
   }
+  
+  renderSequenceSelector() {
+    const handleSelectorChange = (elem) => {
+      const key = elem.target.value;
+      const sequence = loops[key].sequence;
+      this.setState({sequence});
+    }
+    
+    const options = Object.keys(loops).map((key) => {
+      return (
+        <option value={key}>{loops[key].label}</option>
+      )
+    });
+    return (
+      <select onChange={handleSelectorChange}>
+        {options}
+      </select>
+    );
+  }
 
   render() {
     const { sequence } = this.state;
@@ -106,7 +128,8 @@ class Sequencer extends React.Component {
           onClick={this.pauseSequence}
           >Pause
         </button>
-        <input className="control-buttons" onBlur={setBpm} />
+        <input className="control-buttons" onBlur={setBpm} maxLength={10} />
+        {this.renderSequenceSelector()}
         <div>
           {Object.keys(sequence).map((key) => this.renderInstrument(key))}
         </div>

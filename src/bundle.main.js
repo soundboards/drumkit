@@ -18287,8 +18287,11 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_classnames__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Sequencer_css__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Sequencer_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Sequencer_css__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__data_loops__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Sequencer_css__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Sequencer_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__Sequencer_css__);
+
+
 
 
 
@@ -18309,20 +18312,19 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       sequence: {
         kick: [0, 0, 0, 0, 0, 0, 0, 0],
         snare: [0, 0, 0, 0, 0, 0, 0, 0],
-        bass: [0, 0, 0, 0, 0, 0, 0, 0]
+        openHat: [0, 0, 0, 0, 0, 0, 0, 0],
+        closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
       }
     };
 
     this.timerWorker = new Worker('../workers/scheduler');
     this.playSequence = this.playSequence.bind(this);
+    this.pauseSequence = this.pauseSequence.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
 
   playSequence() {
-    if (this.state.playing) {
-      this.timerWorker.postMessage('stop');
-      this.setState({ playing: false });
-    } else {
+    if (!this.state.playing) {
       const interval = calculateInterval(this.state.bpm);
       this.timerWorker.postMessage({ interval });
 
@@ -18337,6 +18339,13 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
         }
       };
       this.setState({ playing: true });
+    }
+  }
+
+  pauseSequence() {
+    if (this.state.playing) {
+      this.timerWorker.postMessage('stop');
+      this.setState({ playing: false });
     }
   }
 
@@ -18364,6 +18373,27 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     );
   }
 
+  renderSequenceSelector() {
+    const handleSelectorChange = elem => {
+      const key = elem.target.value;
+      const sequence = __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][key].sequence;
+      this.setState({ sequence });
+    };
+
+    const options = Object.keys(__WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */]).map(key => {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'option',
+        { value: key },
+        __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][key].label
+      );
+    });
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'select',
+      { onChange: handleSelectorChange },
+      options
+    );
+  }
+
   render() {
     const { sequence } = this.state;
     const setBpm = elem => {
@@ -18380,10 +18410,22 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       null,
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'button',
-        { onClick: this.playSequence },
-        'Play/Pause'
+        {
+          className: 'control-buttons',
+          onClick: this.playSequence
+        },
+        'Play'
       ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { onBlur: setBpm }),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'button',
+        {
+          className: 'control-buttons',
+          onClick: this.pauseSequence
+        },
+        'Pause'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'control-buttons', onBlur: setBpm, maxLength: 10 }),
+      this.renderSequenceSelector(),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         null,
@@ -18452,10 +18494,36 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 /* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+  fouronfloor: {
+    label: "four on the floor",
+    sequence: {
+      kick: [1, 0, 1, 0, 1, 0, 1, 0],
+      snare: [0, 1, 0, 1, 0, 1, 0, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0],
+      closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  },
+  notfouronfloor: {
+    label: "not four on the floor",
+    sequence: {
+      kick: [0, 0, 0, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 0, 0, 0, 0, 0],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0],
+      closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  }
+});
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(31);
+var content = __webpack_require__(32);
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -18469,7 +18537,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(33)(content, options);
+var update = __webpack_require__(34)(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -18501,21 +18569,21 @@ if(false) {
 }
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(32)(false);
+exports = module.exports = __webpack_require__(33)(false);
 // imports
 
 
 // module
-exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: none;\n  height: 3rem;\n  width: 3rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}", ""]);
+exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control-buttons {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  padding: 1rem;\n  font-size: 1.5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 /*
@@ -18597,7 +18665,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -18663,7 +18731,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(34);
+var	fixUrls = __webpack_require__(35);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -18979,7 +19047,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 
