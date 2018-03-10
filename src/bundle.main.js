@@ -18266,19 +18266,129 @@ module.exports = camelize;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Sequencer__ = __webpack_require__(28);
+
 
 
 class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   render() {
-    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h1',
-      null,
-      'test build'
-    );
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Sequencer__["a" /* default */], null);
   }
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (App);
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_classnames__);
+
+
+
+class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      bpm: 120,
+      playing: false,
+      currentStep: 0,
+      totalSteps: 8,
+      sequence: {
+        kick: [0, 0, 0, 0, 0, 0, 0, 0],
+        snare: [0, 0, 0, 0, 0, 0, 0, 0],
+        bass: [0, 0, 0, 0, 0, 0, 0, 0]
+      }
+    };
+
+    this.playSequence = this.playSequence.bind(this);
+  }
+
+  playSequence() {
+    if (this.state.playing) {
+      this.setState({ playing: false });
+      // stop timer
+    } else {
+      //start timer
+      this.setState({ playing: true });
+    }
+  }
+
+  render() {
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'button',
+        { onClick: this.playSequence },
+        'Play/Pause'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
+    );
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Sequencer);
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+  Copyright (c) 2016 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+/* global define */
+
+(function () {
+	'use strict';
+
+	var hasOwn = {}.hasOwnProperty;
+
+	function classNames () {
+		var classes = [];
+
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i];
+			if (!arg) continue;
+
+			var argType = typeof arg;
+
+			if (argType === 'string' || argType === 'number') {
+				classes.push(arg);
+			} else if (Array.isArray(arg)) {
+				classes.push(classNames.apply(null, arg));
+			} else if (argType === 'object') {
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
+				}
+			}
+		}
+
+		return classes.join(' ');
+	}
+
+	if (typeof module !== 'undefined' && module.exports) {
+		module.exports = classNames;
+	} else if (true) {
+		// register as 'classnames', consistent with npm package name
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+			return classNames;
+		}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else {
+		window.classNames = classNames;
+	}
+}());
+
 
 /***/ })
 /******/ ]);
