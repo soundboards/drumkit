@@ -18307,6 +18307,7 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     };
 
     this.playSequence = this.playSequence.bind(this);
+    this.renderInstrument = this.renderInstrument.bind(this);
   }
 
   playSequence() {
@@ -18319,7 +18320,36 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     }
   }
 
+  onButtonClick(position, key) {
+    const { sequence } = this.state;
+    // A better way to manipulate state
+    sequence[key][position] = sequence[key][position] === 1 ? 0 : 1;
+    this.setState(sequence);
+  }
+
+  renderInstrument(key) {
+    const instrumentButtons = this.state.sequence[key].map((buttonState, index) => {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'button',
+        {
+          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()({ test: this.state.currentStep === index }),
+          key: index,
+          onClick: this.onButtonClick.bind(this, index, key)
+        },
+        buttonState
+      );
+    });
+
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      null,
+      instrumentButtons
+    );
+  }
+
   render() {
+    const { sequence } = this.state;
+
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       null,
@@ -18328,7 +18358,11 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
         { onClick: this.playSequence },
         'Play/Pause'
       ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        Object.keys(sequence).map(key => this.renderInstrument(key))
+      )
     );
   }
 }
