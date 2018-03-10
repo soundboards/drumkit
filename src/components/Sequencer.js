@@ -75,9 +75,11 @@ class Sequencer extends React.Component {
   render() {
     const { sequence } = this.state;
     const setBpm = (elem) => {
-      
       // TODO error handling
       const bpm = parseInt(elem.target.value);
+      const interval = calculateInterval(bpm);
+      
+      this.timerWorker.postMessage({ interval });
       this.setState({ bpm });
     }
 

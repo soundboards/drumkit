@@ -18370,9 +18370,11 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
   render() {
     const { sequence } = this.state;
     const setBpm = elem => {
-
       // TODO error handling
       const bpm = parseInt(elem.target.value);
+      const interval = calculateInterval(bpm);
+
+      this.timerWorker.postMessage({ interval });
       this.setState({ bpm });
     };
 
