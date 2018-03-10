@@ -1,12 +1,17 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import styles from './Sequencer.css';
+
+// Helper function
+const calculateInterval = (bpm) => 60000 / bpm;
+
 class Sequencer extends React.Component {
   constructor() {
     super();
     
     this.state = {
-      bpm: 120,
+      bpm: 200,
       playing: false,
       currentStep: 0,
       totalSteps: 8,
@@ -17,16 +22,29 @@ class Sequencer extends React.Component {
       }
     };
     
+    this.timerWorker = new Worker('../workers/scheduler');
     this.playSequence = this.playSequence.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
   
   playSequence() {
     if (this.state.playing) {
+      this.timerWorker.postMessage('stop');
       this.setState({playing: false});
-      // stop timer
     } else {
-      //start timer
+      const interval = calculateInterval(this.state.bpm);
+      this.timerWorker.postMessage({ interval });
+      
+      this.timerWorker.onmessage = (e) => {
+        if (e.data == 'step') {
+          console.log('currentStep', this.state.currentStep);
+          if (this.state.currentStep < this.state.totalSteps - 1) {
+            this.setState({ currentStep: this.state.currentStep + 1 })
+          } else {
+            this.setState({ currentStep: 0 })
+          }
+        }
+      }
       this.setState({playing: true});
     }
   }
@@ -56,10 +74,17 @@ class Sequencer extends React.Component {
   
   render() {
     const { sequence } = this.state;
+    const setBpm = (elem) => {
+      
+      // TODO error handling
+      const bpm = parseInt(elem.target.value);
+      this.setState({ bpm });
+    }
 
     return (
       <div>
         <button onClick={this.playSequence}>Play/Pause</button>
+        <input onBlur={setBpm} />
         <div>
           {Object.keys(sequence).map((key) => this.renderInstrument(key))}
         </div>
