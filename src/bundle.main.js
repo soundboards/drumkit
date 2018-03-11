@@ -18305,15 +18305,15 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     super();
 
     this.state = {
-      bpm: 200,
+      bpm: 125,
       playing: false,
-      currentStep: 0,
-      totalSteps: 8,
+      currentStep: -1,
+      totalSteps: 16,
       sequence: {
-        kick: [0, 0, 0, 0, 0, 0, 0, 0],
-        snare: [0, 0, 0, 0, 0, 0, 0, 0],
-        openHat: [0, 0, 0, 0, 0, 0, 0, 0],
-        closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
+        kick: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        closedHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       }
     };
 
@@ -18326,7 +18326,7 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
   playSequence() {
     if (!this.state.playing) {
       const interval = calculateInterval(this.state.bpm);
-      this.timerWorker.postMessage({ interval });
+      this.timerWorker.postMessage({ action: 'start', interval });
 
       this.timerWorker.onmessage = e => {
         if (e.data == 'step') {
@@ -18375,6 +18375,9 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
 
   renderSequenceSelector() {
     const handleSelectorChange = elem => {
+      if (elem.target.value === "") {
+        return;
+      }
       const key = elem.target.value;
       const sequence = __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][key].sequence;
       this.setState({ sequence });
@@ -18389,7 +18392,14 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     });
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'select',
-      { onChange: handleSelectorChange },
+      {
+        className: 'control',
+        onChange: handleSelectorChange },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'option',
+        { value: '' },
+        'Select Sequence'
+      ),
       options
     );
   }
@@ -18397,11 +18407,16 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
   render() {
     const { sequence } = this.state;
     const setBpm = elem => {
-      // TODO error handling
-      const bpm = parseInt(elem.target.value);
+      const value = elem.target.value;
+
+      if (isNaN(value)) {
+        return;
+      }
+
+      const bpm = parseInt(value);
       const interval = calculateInterval(bpm);
 
-      this.timerWorker.postMessage({ interval });
+      this.timerWorker.postMessage({ action: 'change', interval });
       this.setState({ bpm });
     };
 
@@ -18411,20 +18426,25 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'button',
         {
-          className: 'control-buttons',
+          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('control', { ['control--selected']: this.state.playing }),
           onClick: this.playSequence
         },
-        'Play'
+        '\u25B6\uFE0E'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'button',
         {
-          className: 'control-buttons',
+          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('control', { ['control--selected']: !this.state.playing }),
           onClick: this.pauseSequence
         },
-        'Pause'
+        '\u25FC'
       ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'control-buttons', onBlur: setBpm, maxLength: 10 }),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
+        className: 'control bpm-input',
+        maxLength: 3,
+        onChange: setBpm,
+        value: this.state.bpm
+      }),
       this.renderSequenceSelector(),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
@@ -18501,19 +18521,19 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
   fouronfloor: {
     label: "four on the floor",
     sequence: {
-      kick: [1, 0, 1, 0, 1, 0, 1, 0],
-      snare: [0, 1, 0, 1, 0, 1, 0, 1],
-      openHat: [0, 0, 0, 0, 0, 0, 0, 0],
-      closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
+      kick: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      snare: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      closedHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
   },
   notfouronfloor: {
     label: "not four on the floor",
     sequence: {
-      kick: [0, 0, 0, 0, 0, 0, 0, 0],
-      snare: [0, 0, 0, 0, 0, 0, 0, 0],
-      openHat: [0, 0, 0, 0, 0, 0, 0, 0],
-      closedHat: [0, 0, 0, 0, 0, 0, 0, 0]
+      kick: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      openHat: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      closedHat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
     }
   }
 });
@@ -18577,7 +18597,7 @@ exports = module.exports = __webpack_require__(33)(false);
 
 
 // module
-exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control-buttons {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  padding: 1rem;\n  font-size: 1.5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n", ""]);
+exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control {\n  background-color: #1f2428;\n  height: 3rem;\n  border: 1px solid #000;\n  padding: 0.5rem;\n  font-size: 1.5rem;\n  color: #909090;\n  text-align: center;\n}\n\n.control.control--selected {\n  background-color: #e2c000;\n}\n\n.bpm-input {\n  width: 5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n", ""]);
 
 // exports
 

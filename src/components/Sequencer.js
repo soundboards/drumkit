@@ -14,15 +14,15 @@ class Sequencer extends React.Component {
     super();
     
     this.state = {
-      bpm: 200,
+      bpm: 125,
       playing: false,
-      currentStep: 0,
-      totalSteps: 8,
+      currentStep: -1,
+      totalSteps: 16,
       sequence: {
-        kick: [0,0,0,0,0,0,0,0],
-        snare: [0,0,0,0,0,0,0,0],
-        openHat: [0,0,0,0,0,0,0,0],
-        closedHat: [0,0,0,0,0,0,0,0],
+        kick: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        snare: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        openHat: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        closedHat: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       }
     };
     
@@ -35,7 +35,7 @@ class Sequencer extends React.Component {
   playSequence() {
     if (!this.state.playing) {
       const interval = calculateInterval(this.state.bpm);
-      this.timerWorker.postMessage({ interval });
+      this.timerWorker.postMessage({ action: 'start', interval });
       
       this.timerWorker.onmessage = (e) => {
         if (e.data == 'step') {
@@ -87,6 +87,9 @@ class Sequencer extends React.Component {
   
   renderSequenceSelector() {
     const handleSelectorChange = (elem) => {
+      if (elem.target.value === "") {
+        return;
+      }
       const key = elem.target.value;
       const sequence = loops[key].sequence;
       this.setState({sequence});
@@ -98,7 +101,10 @@ class Sequencer extends React.Component {
       )
     });
     return (
-      <select onChange={handleSelectorChange}>
+      <select
+        className="control"
+        onChange={handleSelectorChange}>
+        <option value="">Select Sequence</option>
         {options}
       </select>
     );
@@ -107,28 +113,43 @@ class Sequencer extends React.Component {
   render() {
     const { sequence } = this.state;
     const setBpm = (elem) => {
-      // TODO error handling
-      const bpm = parseInt(elem.target.value);
+      const value = elem.target.value;
+
+      if (isNaN(value)) {
+        return;
+      }
+
+      const bpm = parseInt(value);
       const interval = calculateInterval(bpm);
       
-      this.timerWorker.postMessage({ interval });
+      this.timerWorker.postMessage({ action: 'change', interval });
       this.setState({ bpm });
     }
 
     return (
       <div>
         <button
-          className="control-buttons"
+          className={classNames('control',
+            { ['control--selected']: this.state.playing}
+          )}
           onClick={this.playSequence}
         >
-          Play
+          ▶︎
         </button>
         <button
-          className="control-buttons"
+          className={classNames('control',
+            { ['control--selected']: !this.state.playing}
+          )}
           onClick={this.pauseSequence}
-          >Pause
+        >
+          ◼
         </button>
-        <input className="control-buttons" onBlur={setBpm} maxLength={10} />
+        <input
+          className="control bpm-input"
+          maxLength={3}
+          onChange={setBpm}
+          value={this.state.bpm}
+        />
         {this.renderSequenceSelector()}
         <div>
           {Object.keys(sequence).map((key) => this.renderInstrument(key))}
