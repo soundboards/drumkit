@@ -18299,6 +18299,12 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 // Helper function
 const calculateInterval = bpm => 60000 / bpm * 4 / 8;
+const nameMap = {
+  kick: "Kick",
+  snare: "Snare",
+  openHat: "Open Hat",
+  closedHat: "Closed Hat"
+};
 
 class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   constructor() {
@@ -18369,7 +18375,19 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      { key: key },
+      {
+        className: 'instrument',
+        key: key
+      },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'instrument--name' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'p',
+          { className: 'instrument--name-text' },
+          nameMap[key]
+        )
+      ),
       instrumentButtons
     );
   }
@@ -18620,7 +18638,7 @@ exports = module.exports = __webpack_require__(33)(false);
 
 
 // module
-exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control {\n  background-color: #1f2428;\n  height: 3rem;\n  border: 1px solid #000;\n  padding: 0.5rem;\n  font-size: 1.5rem;\n  color: #909090;\n  text-align: center;\n}\n\n.control.control--selected {\n  background-color: #e2c000;\n}\n\n.bpm-input {\n  width: 5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n", ""]);
+exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control {\n  background-color: #1f2428;\n  height: 3rem;\n  border: 1px solid #000;\n  padding: 0.5rem;\n  font-size: 1.5rem;\n  color: #909090;\n  text-align: center;\n}\n\n.control.control--selected {\n  background-color: #e2c000;\n}\n\n.bpm-input {\n  width: 5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n.instrument {\n  display: flex;\n}\n\n.instrument--name {\n  display: flex;\n  border: 1px solid #000;\n  justify-content: flex-end;\n  background-color: #3a434b;\n  width: 10rem;\n}\n\n.instrument--name-text {\n  font-family: monospace;\n  font-size: 1.5em;\n  margin-right: 1rem;\n}\n\n", ""]);
 
 // exports
 

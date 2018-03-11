@@ -8,6 +8,12 @@ import styles from './Sequencer.css';
 
 // Helper function
 const calculateInterval = (bpm) => ((60000 / bpm) * 4) / 8;
+const nameMap = {
+  kick: "Kick",
+  snare: "Snare",
+  openHat: "Open Hat",
+  closedHat: "Closed Hat"
+};
 
 class Sequencer extends React.Component {
   constructor() {
@@ -83,7 +89,17 @@ class Sequencer extends React.Component {
       );
     });
     
-    return <div key={key}>{instrumentButtons}</div>
+    return (
+      <div
+        className="instrument"
+        key={key}
+      >
+        <div className="instrument--name">
+          <p className="instrument--name-text">{nameMap[key]}</p>
+        </div>
+        {instrumentButtons}
+      </div>  
+    );
   }
   
   renderSequenceSelector() {

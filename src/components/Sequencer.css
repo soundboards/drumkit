@@ -39,3 +39,21 @@ body {
   background-color: #00E34F;
 }
 
+.instrument {
+  display: flex;
+}
+
+.instrument--name {
+  display: flex;
+  border: 1px solid #000;
+  justify-content: flex-end;
+  background-color: #3a434b;
+  width: 10rem;
+}
+
+.instrument--name-text {
+  font-family: monospace;
+  font-size: 1.5em;
+  margin-right: 1rem;
+}
+
