@@ -7,7 +7,7 @@ import styles from './Sequencer.css';
 
 
 // Helper function
-const calculateInterval = (bpm) => 60000 / bpm;
+const calculateInterval = (bpm) => ((60000 / bpm) * 4) / 8;
 
 class Sequencer extends React.Component {
   constructor() {
@@ -28,7 +28,7 @@ class Sequencer extends React.Component {
     
     this.timerWorker = new Worker('../workers/scheduler');
     this.playSequence = this.playSequence.bind(this);
-    this.pauseSequence = this.pauseSequence.bind(this);
+    this.stopSequence = this.stopSequence.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
   
@@ -51,10 +51,11 @@ class Sequencer extends React.Component {
     }
   }
   
-  pauseSequence() {
+  stopSequence(reset = true) {
     if (this.state.playing) {
       this.timerWorker.postMessage('stop');
       this.setState({playing: false});
+      reset && this.setState({currentStep: -1});
     }
   }
   
@@ -82,7 +83,7 @@ class Sequencer extends React.Component {
       );
     });
     
-    return <div>{instrumentButtons}</div>
+    return <div key={key}>{instrumentButtons}</div>
   }
   
   renderSequenceSelector() {
@@ -95,9 +96,14 @@ class Sequencer extends React.Component {
       this.setState({sequence});
     }
     
-    const options = Object.keys(loops).map((key) => {
+    const options = Object.keys(loops).map((seq) => {
       return (
-        <option value={key}>{loops[key].label}</option>
+        <option
+          key={seq}
+          value={seq}
+        >
+          {loops[seq].label}
+        </option>
       )
     });
     return (
@@ -137,12 +143,16 @@ class Sequencer extends React.Component {
           ▶︎
         </button>
         <button
-          className={classNames('control',
-            { ['control--selected']: !this.state.playing}
-          )}
-          onClick={this.pauseSequence}
+          className="control"
+          onClick={this.stopSequence}
         >
           ◼
+        </button>
+        <button
+          className="control"
+          onClick={() => { this.stopSequence(false) }}
+        >
+          ❚❚
         </button>
         <input
           className="control bpm-input"

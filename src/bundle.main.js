@@ -18298,7 +18298,7 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 
 // Helper function
-const calculateInterval = bpm => 60000 / bpm;
+const calculateInterval = bpm => 60000 / bpm * 4 / 8;
 
 class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   constructor() {
@@ -18319,7 +18319,7 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
 
     this.timerWorker = new Worker('../workers/scheduler');
     this.playSequence = this.playSequence.bind(this);
-    this.pauseSequence = this.pauseSequence.bind(this);
+    this.stopSequence = this.stopSequence.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
 
@@ -18342,10 +18342,11 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     }
   }
 
-  pauseSequence() {
+  stopSequence(reset = true) {
     if (this.state.playing) {
       this.timerWorker.postMessage('stop');
       this.setState({ playing: false });
+      reset && this.setState({ currentStep: -1 });
     }
   }
 
@@ -18368,7 +18369,7 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      null,
+      { key: key },
       instrumentButtons
     );
   }
@@ -18383,11 +18384,14 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       this.setState({ sequence });
     };
 
-    const options = Object.keys(__WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */]).map(key => {
+    const options = Object.keys(__WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */]).map(seq => {
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'option',
-        { value: key },
-        __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][key].label
+        {
+          key: seq,
+          value: seq
+        },
+        __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][seq].label
       );
     });
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -18434,10 +18438,20 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'button',
         {
-          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('control', { ['control--selected']: !this.state.playing }),
-          onClick: this.pauseSequence
+          className: 'control',
+          onClick: this.stopSequence
         },
         '\u25FC'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'button',
+        {
+          className: 'control',
+          onClick: () => {
+            this.stopSequence(false);
+          }
+        },
+        '\u275A\u275A'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
         className: 'control bpm-input',
@@ -18519,16 +18533,25 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 "use strict";
 /* harmony default export */ __webpack_exports__["a"] = ({
   fouronfloor: {
-    label: "four on the floor",
+    label: "Four on the floor",
     sequence: {
-      kick: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
       snare: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
       openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       closedHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
   },
   notfouronfloor: {
-    label: "not four on the floor",
+    label: "Not four on the floor",
+    sequence: {
+      kick: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      openHat: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      closedHat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+    }
+  },
+  wowmusic: {
+    label: "Wow Music",
     sequence: {
       kick: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
