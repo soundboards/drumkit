@@ -18287,7 +18287,7 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_classnames___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_classnames__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__data_loops__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_data_loops__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Sequencer_css__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Sequencer_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__Sequencer_css__);
 
@@ -18297,7 +18297,6 @@ class App extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 
 
-// Helper function
 const calculateInterval = bpm => 60000 / bpm * 4 / 8;
 const nameMap = {
   kick: "Kick",
@@ -18313,6 +18312,7 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     this.state = {
       bpm: 125,
       playing: false,
+      paused: false,
       currentStep: -1,
       totalSteps: 16,
       sequence: {
@@ -18323,46 +18323,76 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
       }
     };
 
-    this.timerWorker = new Worker('../workers/scheduler');
+    this.timerWorker = new Worker('workers/scheduler');
+    this.handleStep = this.handleStep.bind(this);
     this.playSequence = this.playSequence.bind(this);
     this.stopSequence = this.stopSequence.bind(this);
+    this.renderButtons = this.renderButtons.bind(this);
     this.renderInstrument = this.renderInstrument.bind(this);
   }
 
+  /**
+   * Receives messages from the timer in the service worker
+   * Handles advancing steps in the sequencer
+   * Updates the component currentStep state and reverts back to the beginning of the sequence
+   * @param  {object} event data being received from the service worker
+   */
+  handleStep(event) {
+    if (event.data === 'step') {
+      if (this.state.currentStep < this.state.totalSteps - 1) {
+        this.setState({ currentStep: this.state.currentStep + 1 });
+      } else {
+        this.setState({ currentStep: 0 });
+      }
+    }
+  }
+
+  /**
+   * Calls the service worker to start the timer
+   * Creates listener for receiving messages from the service worker
+   */
   playSequence() {
     if (!this.state.playing) {
       const interval = calculateInterval(this.state.bpm);
       this.timerWorker.postMessage({ action: 'start', interval });
 
-      this.timerWorker.onmessage = e => {
-        if (e.data == 'step') {
-          console.log('currentStep', this.state.currentStep);
-          if (this.state.currentStep < this.state.totalSteps - 1) {
-            this.setState({ currentStep: this.state.currentStep + 1 });
-          } else {
-            this.setState({ currentStep: 0 });
-          }
-        }
-      };
-      this.setState({ playing: true });
+      this.timerWorker.onmessage = this.handleStep;
+      this.setState({ playing: true, paused: false });
     }
   }
 
+  /**
+   * Creates 
+   * @param  {Boolean} [reset=true] [description]
+   * @return {[type]}               [description]
+   */
   stopSequence(reset = true) {
     if (this.state.playing) {
       this.timerWorker.postMessage('stop');
-      this.setState({ playing: false });
+      this.setState({ playing: false, paused: !reset });
       reset && this.setState({ currentStep: -1 });
     }
   }
 
+  /**
+   * Change the state of a step when button is clicked
+   * Update component's state sequence
+   * @param  {number} position position of the button clicked
+   * @param  {string} key      the instrument key
+   */
   onButtonClick(position, key) {
     const { sequence } = this.state;
-    // A better way to manipulate state
+
     sequence[key][position] = sequence[key][position] === 1 ? 0 : 1;
     this.setState(sequence);
   }
 
+  /**
+   * Render's instrument row and attaches click handler to buttons rendered
+   *
+   * @param  {string} key receives instrument key
+   * @return {node}       returns JSX representation of the instrument
+   */
   renderInstrument(key) {
     const { sequence } = this.state;
     const instrumentButtons = sequence[key].map((buttonState, index) => {
@@ -18392,24 +18422,30 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     );
   }
 
+  /**
+   * Renders the selector for the sequence
+   * Receives data from imported loops
+   * Changes the current sequence being played to the sequence selected
+   * @return {node} options for sequences
+   */
   renderSequenceSelector() {
     const handleSelectorChange = elem => {
       if (elem.target.value === "") {
         return;
       }
       const key = elem.target.value;
-      const sequence = __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][key].sequence;
+      const sequence = __WEBPACK_IMPORTED_MODULE_2_data_loops__["a" /* default */][key].sequence;
       this.setState({ sequence });
     };
 
-    const options = Object.keys(__WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */]).map(seq => {
+    const options = Object.keys(__WEBPACK_IMPORTED_MODULE_2_data_loops__["a" /* default */]).map(seq => {
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'option',
         {
           key: seq,
           value: seq
         },
-        __WEBPACK_IMPORTED_MODULE_2__data_loops__["a" /* default */][seq].label
+        __WEBPACK_IMPORTED_MODULE_2_data_loops__["a" /* default */][seq].label
       );
     });
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -18426,13 +18462,53 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     );
   }
 
+  /**
+   * Renders control buttons
+   * Attaches on click handler to buttons
+   * Attaches active indicator
+   * 
+   * @return {[node]} returns buttons 
+   */
+  renderButtons() {
+    const { playing, paused } = this.state;
+    const buttons = [{
+      label: 'play',
+      name: '▶︎',
+      indicator: playing,
+      onClick: this.playSequence
+    }, {
+      label: 'stop',
+      name: '◼',
+      indicator: !playing && !paused,
+      onClick: this.stopSequence
+    }, {
+      label: 'pause',
+      name: '❚❚',
+      indicator: paused,
+      onClick: () => {
+        this.stopSequence(false);
+      }
+    }];
+
+    return buttons.map((btn, i) => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'button',
+      {
+        ariaLabel: btn.label,
+        className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('control', { ['control--selected']: btn.indicator }),
+        key: `control-${i}`,
+        onClick: btn.onClick
+      },
+      btn.name
+    ));
+  }
+
   render() {
     const { sequence } = this.state;
-    const setBpm = elem => {
+    const handleChange = elem => {
       const value = elem.target.value;
 
       if (isNaN(value)) {
-        return;
+        return 0;
       }
 
       const bpm = parseInt(value);
@@ -18445,36 +18521,11 @@ class Sequencer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       null,
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'button',
-        {
-          className: __WEBPACK_IMPORTED_MODULE_1_classnames___default()('control', { ['control--selected']: this.state.playing }),
-          onClick: this.playSequence
-        },
-        '\u25B6\uFE0E'
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'button',
-        {
-          className: 'control',
-          onClick: this.stopSequence
-        },
-        '\u25FC'
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'button',
-        {
-          className: 'control',
-          onClick: () => {
-            this.stopSequence(false);
-          }
-        },
-        '\u275A\u275A'
-      ),
+      this.renderButtons(),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
         className: 'control bpm-input',
         maxLength: 3,
-        onChange: setBpm,
+        onChange: handleChange,
         value: this.state.bpm
       }),
       this.renderSequenceSelector(),
@@ -18638,7 +18689,7 @@ exports = module.exports = __webpack_require__(33)(false);
 
 
 // module
-exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control {\n  background-color: #1f2428;\n  height: 3rem;\n  border: 1px solid #000;\n  padding: 0.5rem;\n  font-size: 1.5rem;\n  color: #909090;\n  text-align: center;\n}\n\n.control.control--selected {\n  background-color: #e2c000;\n}\n\n.bpm-input {\n  width: 5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n.instrument {\n  display: flex;\n}\n\n.instrument--name {\n  display: flex;\n  border: 1px solid #000;\n  justify-content: flex-end;\n  background-color: #3a434b;\n  width: 10rem;\n}\n\n.instrument--name-text {\n  font-family: monospace;\n  font-size: 1.5em;\n  margin-right: 1rem;\n}\n\n", ""]);
+exports.push([module.i, "body {\n  background-color: #000;\n}\n\n.control {\n  background-color: #1f2428;\n  height: 3rem;\n  border: 1px solid #000;\n  padding: 0.5rem;\n  font-size: 1.5rem;\n  color: #909090;\n  text-align: center;\n}\n\nbutton.control {\n  padding-left: 1rem;\n  padding-right: 1rem;\n}\n\n.control.control--selected {\n  background-color: #e2c000;\n}\n\n.bpm-input {\n  width: 5rem;\n}\n\n.sequence-button {\n  background-color: #1f2428;\n  border: 1px solid #000;\n  height: 4rem;\n  width: 4rem;\n}\n\n.sequence-button.sequence-button--seq {\n  background-color: #3a434b;\n}\n\n.sequence-button.sequence-button--selected {\n  background-color: #e2c000;\n}\n\n.sequence-button.sequence-button--seq.sequence-button--selected {\n  background-color: #00E34F;\n}\n\n.instrument {\n  display: flex;\n}\n\n.instrument--name {\n  display: flex;\n  border: 1px solid #000;\n  justify-content: flex-end;\n  background-color: #3a434b;\n  min-width: 10rem;\n}\n\n.instrument--name-text {\n  margin-right: 1rem;\n  font-family: monospace;\n  font-size: 1.5em;\n  color: #909090;\n}\n\n", ""]);
 
 // exports
 

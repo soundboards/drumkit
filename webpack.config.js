@@ -6,6 +6,9 @@ module.exports = {
     path: path.join(__dirname + 'src'),
     filename: 'bundle.main.js'
   },
+  resolve: {
+    modules: [path.resolve(__dirname, "src"), "node_modules"]
+  },
   module: {
     loaders: [
       {
