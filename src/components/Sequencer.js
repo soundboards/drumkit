@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import loops from 'data/loops';
 
-import styles from './Sequencer.css';
+import './Sequencer.css';
 
 const calculateInterval = (bpm) => ((60000 / bpm) * 4) / 8;
 const nameMap = {
@@ -93,7 +93,10 @@ class Sequencer extends React.Component {
     const { sequence } = this.state;
 
     sequence[key][position] = (sequence[key][position] === 1) ? 0 : 1;
-    this.setState(sequence);
+    this.setState((prevState) => {
+      ...prevState,
+      sequence
+    });
   }
 
   /**
